@@ -3,8 +3,8 @@ echo === Java Deprecation Utility Demo ===
 echo.
 
 REM Compile the utility
-echo 1. Compiling DeprecationUtility...
-javac DeprecationUtility.java
+echo 1. Compiling utility.DeprecationUtility...
+javac utility.DeprecationUtility.java
 if %errorlevel% equ 0 (
     echo    ✓ Compilation successful
 ) else (
@@ -36,8 +36,8 @@ echo    ...
 echo.
 
 REM Run the utility to deprecate calculateTotal method
-echo 4. Running DeprecationUtility to deprecate 'calculateTotal' method...
-java DeprecationUtility sample-project calculateTotal
+echo 4. Running utility.DeprecationUtility to deprecate 'calculateTotal' method...
+java utility.DeprecationUtility sample-project calculateTotal
 echo.
 
 REM Show the updated content
@@ -51,9 +51,9 @@ findstr /n "calculateTotal" sample-project\MathUtils.java
 echo.
 
 REM Run the utility to deprecate legacy methods
-echo 6. Running DeprecationUtility to deprecate legacy methods...
-java DeprecationUtility sample-project legacyCalculate
-java DeprecationUtility sample-project oldProcess
+echo 6. Running utility.DeprecationUtility to deprecate legacy methods...
+java utility.DeprecationUtility sample-project legacyCalculate
+java utility.DeprecationUtility sample-project oldProcess
 echo.
 
 REM Show the final state

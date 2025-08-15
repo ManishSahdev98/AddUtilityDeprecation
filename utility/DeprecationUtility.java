@@ -1,8 +1,9 @@
+package utility;
+
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
-import java.util.stream.*;
 
 /**
  * Utility to deprecate methods and classes in Java projects.
@@ -13,7 +14,7 @@ import java.util.stream.*;
  */
 public class DeprecationUtility {
     
-    private static final String DEPRECATION_COMMENT = "/** Do not change without asking MODS Team*/";
+    private static final String DEPRECATION_COMMENT = "/** Do not change without asking Sahdev Team*/";
     private static final String DEPRECATION_ANNOTATION = "@Deprecated";
     
     private final Path projectRoot;
@@ -31,9 +32,9 @@ public class DeprecationUtility {
      */
     public static void main(String[] args) {
         if (args.length < 2) {
-            System.out.println("Usage: java DeprecationUtility <project_path> <method_name> [method_signature]");
-            System.out.println("Example: java DeprecationUtility /path/to/project calculateTotal");
-            System.out.println("Example: java DeprecationUtility /path/to/project calculateTotal \"int calculateTotal(int a, int b)\"");
+            System.out.println("Usage: java utility.DeprecationUtility <project_path> <method_name> [method_signature]");
+            System.out.println("Example: java utility.DeprecationUtility /path/to/project calculateTotal");
+            System.out.println("Example: java utility.DeprecationUtility /path/to/project calculateTotal \"int calculateTotal(int a, int b)\"");
             System.exit(1);
         }
         

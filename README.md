@@ -21,30 +21,30 @@ A comprehensive Java utility to automatically deprecate methods and classes acro
 ### Basic Usage
 
 ```bash
-java DeprecationUtility <project_path> <method_name>
+java utility.DeprecationUtility <project_path> <method_name>
 ```
 
 ### Advanced Usage with Method Signature
 
 ```bash
-java DeprecationUtility <project_path> <method_name> "<method_signature>"
+java utility.DeprecationUtility <project_path> <method_name> "<method_signature>"
 ```
 
 ### Examples
 
 1. **Deprecate a method by name only:**
    ```bash
-   java DeprecationUtility /path/to/your/project calculateTotal
+   java utility.DeprecationUtility /path/to/your/project calculateTotal
    ```
 
 2. **Deprecate a method with specific signature:**
    ```bash
-   java DeprecationUtility /path/to/your/project calculateTotal "int calculateTotal(int a, int b)"
+   java utility.DeprecationUtility /path/to/your/project calculateTotal "int calculateTotal(int a, int b)"
    ```
 
 3. **Deprecate a method in current directory:**
    ```bash
-   java DeprecationUtility . processData
+   java utility.DeprecationUtility . processData
    ```
 
 ## How It Works
@@ -86,7 +86,7 @@ public void methodName() {
 ## Compilation
 
 ```bash
-javac DeprecationUtility.java
+javac utility.DeprecationUtility.java
 ```
 
 ## Example Output

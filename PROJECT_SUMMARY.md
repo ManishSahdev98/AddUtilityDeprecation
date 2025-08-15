@@ -4,7 +4,7 @@
 
 ```
 Deprecated Utility/
-├── DeprecationUtility.java      # Main utility class
+├── utility.DeprecationUtility.java      # Main utility class
 ├── README.md                     # Comprehensive documentation
 ├── demo.sh                      # Unix/Linux demo script
 ├── demo.bat                     # Windows demo script
@@ -55,14 +55,14 @@ Deprecated Utility/
 
 ```bash
 # Deprecate a method by name
-java DeprecationUtility /path/to/project calculateTotal
+java utility.DeprecationUtility /path/to/project calculateTotal
 
 # Deprecate a method with specific signature
-java DeprecationUtility /path/to/project calculateTotal "int calculateTotal(int a, int b)"
+java utility.DeprecationUtility /path/to/project calculateTotal "int calculateTotal(int a, int b)"
 
 # Deprecate multiple methods (run separately)
-java DeprecationUtility /path/to/project legacyCalculate
-java DeprecationUtility /path/to/project oldProcess
+java utility.DeprecationUtility /path/to/project legacyCalculate
+java utility.DeprecationUtility /path/to/project oldProcess
 ```
 
 ## Technical Details

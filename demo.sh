@@ -5,7 +5,7 @@ echo
 
 # Compile the utility
 echo "1. Compiling DeprecationUtility..."
-javac DeprecationUtility.java
+javac utility.DeprecationUtility.java
 if [ $? -eq 0 ]; then
     echo "   ✓ Compilation successful"
 else
@@ -37,7 +37,7 @@ echo
 
 # Run the utility to deprecate calculateTotal method
 echo "4. Running DeprecationUtility to deprecate 'calculateTotal' method..."
-java DeprecationUtility sample-project calculateTotal
+java utility.DeprecationUtility sample-project calculateTotal
 echo
 
 # Show the updated content
@@ -52,8 +52,8 @@ echo
 
 # Run the utility to deprecate legacy methods
 echo "6. Running DeprecationUtility to deprecate legacy methods..."
-java DeprecationUtility sample-project legacyCalculate
-java DeprecationUtility sample-project oldProcess
+java utility.DeprecationUtility sample-project legacyCalculate
+java utility.DeprecationUtility sample-project oldProcess
 echo
 
 # Show the final state
