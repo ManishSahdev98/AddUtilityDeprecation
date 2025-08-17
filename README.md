@@ -171,6 +171,14 @@ The utility can detect various method declaration patterns:
 2. **Method Not Found**: Check if the method name is spelled correctly
 3. **No Changes Made**: The method might already be deprecated or not found
 
+## Run the application
+mvn clean package
+mvn tomcat7:run
+
+## Stop the application
+mvn tomcat7:shutdown
+pkill -f tomcat
+
 ### Debug Mode
 
 The utility provides detailed output about what it's doing. If you need more information, you can modify the source code to add additional logging.
