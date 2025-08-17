@@ -43,13 +43,13 @@ Deprecated Utility/
 
 ## Key Features Demonstrated
 
-✅ **Method Finding**: Locates methods across multiple files  
-✅ **Smart Deprecation**: Avoids duplicate deprecation  
-✅ **Comment Addition**: Adds required MODS Team comment  
-✅ **Annotation Addition**: Adds `@Deprecated` annotation  
-✅ **Class Analysis**: Automatically detects classes to deprecate  
-✅ **Safe Updates**: Only modifies files that need changes  
-✅ **Build Exclusion**: Skips build directories automatically  
+**Method Finding**: Locates methods across multiple files  
+**Smart Deprecation**: Avoids duplicate deprecation  
+**Comment Addition**: Adds required MODS Team comment  
+**Annotation Addition**: Adds `@Deprecated` annotation  
+**Class Analysis**: Automatically detects classes to deprecate  
+**Safe Updates**: Only modifies files that need changes  
+**Build Exclusion**: Skips build directories automatically  
 
 ## Usage Examples
 

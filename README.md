@@ -21,30 +21,32 @@ A comprehensive Java utility to automatically deprecate methods and classes acro
 ### Basic Usage
 
 ```bash
-java utility.DeprecationUtility <project_path> <method_name>
+# After building with build.sh or build.bat
+java -cp dotClassFiles utility.DeprecationUtility <project_path> <method_name>
 ```
 
 ### Advanced Usage with Method Signature
 
 ```bash
-java utility.DeprecationUtility <project_path> <method_name> "<method_signature>"
+# After building with build.sh or build.bat
+java -cp dotClassFiles utility.DeprecationUtility <project_path> <method_name> "<method_signature>"
 ```
 
 ### Examples
 
 1. **Deprecate a method by name only:**
    ```bash
-   java utility.DeprecationUtility /path/to/your/project calculateTotal
+   java -cp dotClassFiles utility.DeprecationUtility /path/to/your/project calculateTotal
    ```
 
 2. **Deprecate a method with specific signature:**
    ```bash
-   java utility.DeprecationUtility /path/to/your/project calculateTotal "int calculateTotal(int a, int b)"
+   java -cp dotClassFiles utility.DeprecationUtility /path/to/your/project calculateTotal "int calculateTotal(int a, int b)"
    ```
 
 3. **Deprecate a method in current directory:**
    ```bash
-   java utility.DeprecationUtility . processData
+   java -cp dotClassFiles utility.DeprecationUtility . processData
    ```
 
 ## How It Works
@@ -83,10 +85,49 @@ public void methodName() {
 - **Conflict Avoidance**: Won't modify already deprecated methods/classes
 - **Build Directory Exclusion**: Automatically skips `/target/` and `/build/` directories
 
+## Project Structure
+
+```
+AddUtilityDeprecation/
+├── utility/
+│   └── DeprecationUtility.java
+├── sample-project/
+│   ├── Calculator.java
+│   ├── MathUtils.java
+│   └── OldCalculator.java
+├── dotClassFiles/          # Compiled .class files
+│   └── utility/
+│       ├── DeprecationUtility.class
+│       ├── DeprecationUtility$ClassInfo.class
+│       └── DeprecationUtility$MethodInfo.class
+├── build.sh               # Unix/Linux build script
+├── build.bat              # Windows build script
+├── demo.sh                # Unix/Linux demo script
+└── demo.bat               # Windows demo script
+```
+
 ## Compilation
 
+### Using Build Scripts (Recommended)
+
+**Unix/Linux/macOS:**
 ```bash
-javac utility.DeprecationUtility.java
+./build.sh
+```
+
+**Windows:**
+```cmd
+build.bat
+```
+
+### Manual Compilation
+
+```bash
+# Create output directory
+mkdir -p dotClassFiles
+
+# Compile to dotClassFiles folder
+javac -d dotClassFiles utility/DeprecationUtility.java
 ```
 
 ## Example Output

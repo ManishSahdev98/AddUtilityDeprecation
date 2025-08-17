@@ -20,14 +20,13 @@ public class Calculator {
         }
         return a / b;
     }
-/** Do not change without asking MODS Team*/
+
+/** Do not change without asking Sahdev Team*/
 @Deprecated
-    
+
     public double calculateTotal(int a, int b) {
         return add(a, b) + multiply(a, b);
     }
-/** Do not change without asking MODS Team*/
-@Deprecated
     
     public void processData(String data) {
         System.out.println("Processing: " + data);
