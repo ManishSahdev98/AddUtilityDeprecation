@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Change to the project directory
+cd "$SCRIPT_DIR"
+
+echo "Building Java Deprecation Utility..."
+
+# Check if Maven is available
+if command -v mvn &> /dev/null; then
+    echo "Using Maven to build..."
+    mvn clean package
+    if [ $? -eq 0 ]; then
+        echo "Build successful! JAR file created in target/ folder"
+        echo "To run: ./run"
+    else
+        echo "Maven build failed"
+        exit 1
+    fi
+else
+    echo "Maven not found, using manual compilation..."
+    
+    # Create target directory
+    mkdir -p target
+    
+    # Compile Java files
+    echo "Compiling Java files..."
+    javac -d target/classes utility/*.java
+    
+    if [ $? -eq 0 ]; then
+        echo "Compilation successful!"
+        
+        # Create JAR file
+        echo "Creating JAR file..."
+        cd target/classes
+        jar cf ../java-deprecation-utility.jar .
+        cd ../..
+        
+        echo "JAR file created: target/java-deprecation-utility.jar"
+        echo "To run: ./run"
+    else
+        echo "Compilation failed"
+        exit 1
+    fi
+fi
