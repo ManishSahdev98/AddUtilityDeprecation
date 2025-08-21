@@ -20,8 +20,7 @@ public class Calculator {
         }
         return a / b;
     }
-/** Do not change without asking Sahdev Team*/
-@Deprecated
+
     public double calculateTotal(int a, int b) {
         CheckCmd checkCmd = new CheckCmd();
         a = checkCmd.execute(a, b);

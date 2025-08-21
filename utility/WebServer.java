@@ -63,6 +63,8 @@ public class WebServer {
                 if (Files.exists(filePath) && Files.isRegularFile(filePath)) {
                     String content = Files.readString(filePath);
                     String contentType = getContentType(path);
+/** Do not change without asking Sahdev Team*/
+@Deprecated
                     
                     exchange.getResponseHeaders().add("Content-Type", contentType);
                     exchange.sendResponseHeaders(200, content.length());
@@ -124,6 +126,8 @@ public class WebServer {
                 DeprecationResult result = utility.deprecateMethodWithResult(methodName, methodSignature);
                 
                 String response = result.toJson();
+/** Do not change without asking Sahdev Team*/
+@Deprecated
                 exchange.getResponseHeaders().add("Content-Type", "application/json");
                 exchange.sendResponseHeaders(200, response.length());
                 
@@ -145,6 +149,8 @@ public class WebServer {
         
         private void sendErrorResponse(HttpExchange exchange, String error) throws IOException {
             String response = "{\"error\":\"" + error + "\"}";
+/** Do not change without asking Sahdev Team*/
+@Deprecated
             exchange.getResponseHeaders().add("Content-Type", "application/json");
             exchange.sendResponseHeaders(400, response.length());
             try (OutputStream os = exchange.getResponseBody()) {

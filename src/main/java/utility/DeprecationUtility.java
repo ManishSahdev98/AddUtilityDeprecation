@@ -90,11 +90,17 @@ public class DeprecationUtility {
             String line = lines[i];
             
             if (methodSignature != null) {
-                if (line.trim().contains(methodSignature) && !isMethodDeprecated(content, i)) {
+                String normalizedLine = line.trim().replaceAll("\\s+", " ");
+                String normalizedSignature = methodSignature.trim().replaceAll("\\s+", " ");
+                
+                if (normalizedLine.contains(normalizedSignature) || 
+                    normalizedLine.contains("public " + normalizedSignature) ||
+                    normalizedLine.contains("private " + normalizedSignature) ||
+                    normalizedLine.contains("protected " + normalizedSignature)) {
                     methods.add(new MethodInfo(i, line, methodName));
                 }
             } else {
-                if (line.trim().contains(methodName + "(") && !isMethodDeprecated(content, i) && 
+                if (line.trim().contains(methodName + "(") && 
                     !line.trim().contains("System.out.println") && !line.trim().contains("System.err.println")) {
                     methods.add(new MethodInfo(i, line, methodName));
                 }
@@ -132,7 +138,7 @@ public class DeprecationUtility {
         for (int i = 0; i < lines.length; i++) {
             if (i == insertLine) {
                 newContent.append("\n").append(DEPRECATION_COMMENT).append("\n");
-                newContent.append(DEPRECATION_ANNOTATION);
+                newContent.append(DEPRECATION_ANNOTATION).append("\n");
             }
             newContent.append(lines[i]);
             if (i < lines.length - 1) {
