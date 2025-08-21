@@ -74,7 +74,6 @@ The utility adds the following above each deprecated method/class:
 /** Do not change without asking MODS Team*/
 @Deprecated
 public void methodName() {
-    // method implementation
 }
 ```
 

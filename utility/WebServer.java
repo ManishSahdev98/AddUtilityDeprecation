@@ -26,13 +26,10 @@ public class WebServer {
     }
     
     private void setupRoutes() {
-        // Serve static HTML file
         server.createContext("/", new StaticFileHandler());
         
-        // API endpoint for deprecation
         server.createContext("/api/deprecate", new DeprecationHandler());
         
-        // Set thread pool
         server.setExecutor(Executors.newFixedThreadPool(10));
     }
     
@@ -56,13 +53,11 @@ public class WebServer {
         public void handle(HttpExchange exchange) throws IOException {
             String path = exchange.getRequestURI().getPath();
             
-            // Default to index.html for root path
             if (path.equals("/")) {
                 path = "/index.html";
             }
             
             try {
-                // Read the file from the project root
                 Path filePath = Paths.get(".").resolve(path.substring(1));
                 
                 if (Files.exists(filePath) && Files.isRegularFile(filePath)) {
@@ -76,7 +71,6 @@ public class WebServer {
                         os.write(content.getBytes());
                     }
                 } else {
-                    // File not found
                     String response = "File not found: " + path;
                     exchange.sendResponseHeaders(404, response.length());
                     try (OutputStream os = exchange.getResponseBody()) {
@@ -113,27 +107,22 @@ public class WebServer {
             }
             
             try {
-                // Read request body
                 String requestBody = new String(exchange.getRequestBody().readAllBytes());
                 
-                // Parse JSON (simple parsing for demo purposes)
                 String methodName = extractValue(requestBody, "methodName");
                 String methodSignature = extractValue(requestBody, "methodSignature");
                 String projectPath = extractValue(requestBody, "projectPath");
-
-/** Do not change without asking Sahdev Team*/
-@Deprecated
                 
                 if (methodName == null || projectPath == null) {
                     sendErrorResponse(exchange, "Missing required parameters: methodName and projectPath");
                     return;
                 }
+/** Do not change without asking Sahdev Team*/
+@Deprecated
                 
-                // Run deprecation utility
                 DeprecationUtility utility = new DeprecationUtility(projectPath);
                 DeprecationResult result = utility.deprecateMethodWithResult(methodName, methodSignature);
                 
-                // Send success response
                 String response = result.toJson();
                 exchange.getResponseHeaders().add("Content-Type", "application/json");
                 exchange.sendResponseHeaders(200, response.length());
@@ -148,13 +137,9 @@ public class WebServer {
         }
         
         private String extractValue(String json, String key) {
-            // Simple JSON parsing for demo purposes
             String pattern = "\"" + key + "\"\\s*:\\s*\"([^\"]*)\"";
             java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern);
             java.util.regex.Matcher m = p.matcher(json);
-
-/** Do not change without asking Sahdev Team*/
-@Deprecated
             return m.find() ? m.group(1) : null;
         }
         
@@ -196,13 +181,7 @@ public class WebServer {
             json.append("\"filesUpdated\":").append(filesUpdated).append(",");
             json.append("\"methodsDeprecated\":").append(methodsDeprecated).append(",");
             json.append("\"classesDeprecated\":").append(classesDeprecated).append(",");
-
-/** Do not change without asking Sahdev Team*/
-@Deprecated
             json.append("\"details\":\"").append(details != null ? details.replace("\"", "\\\"") : "").append("\",");
-
-/** Do not change without asking Sahdev Team*/
-@Deprecated
             json.append("\"error\":\"").append(error != null ? error.replace("\"", "\\\"") : "").append("\"");
             json.append("}");
             return json.toString();
@@ -215,18 +194,15 @@ public class WebServer {
             WebServer webServer = new WebServer(port);
             webServer.start();
             
-            // Keep the server running without blocking
             System.out.println("Web server is now running in the background");
             System.out.println("Access the UI at: http://localhost:" + port);
             System.out.println("To stop the server, use: pkill -f WebServer");
             
-            // Add shutdown hook to gracefully stop the server
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 System.out.println("\nShutting down web server...");
                 webServer.stop();
             }));
             
-            // Keep the main thread alive
             while (true) {
                 try {
                     Thread.sleep(1000);

@@ -61,7 +61,6 @@ public class DeprecationUtility {
             String content = Files.readString(javaFile);
             String originalContent = content;
 
-
             List<MethodInfo> methods = findMethodDeclarations(content, methodName, methodSignature);
 
             if (!methods.isEmpty()) {
@@ -71,8 +70,9 @@ public class DeprecationUtility {
 
                 for (MethodInfo method : methods) {
                     content = deprecateMethodInContent(content, method);
+                    
+                    content = deprecateCalledMethods(content, method);
                 }
-
 
                 if (!content.equals(originalContent)) {
                     Files.writeString(javaFile, content);
@@ -86,21 +86,16 @@ public class DeprecationUtility {
         List<MethodInfo> methods = new ArrayList<>();
         String[] lines = content.split("\n");
 
-        String methodPattern;
-
-        if (methodSignature != null) {
-            methodPattern = Pattern.quote(methodSignature);
-        } else {
-            methodPattern = "\\s*\\w+\\s+\\w+\\s*" + Pattern.quote(methodName) + "\\s*\\(";
-        }
-
-        Pattern pattern = Pattern.compile(methodPattern);
-
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
-            if (pattern.matcher(line).find()) {
-                // Check if method is not already deprecated
-                if (!isMethodDeprecated(content, i)) {
+            
+            if (methodSignature != null) {
+                if (line.trim().contains(methodSignature) && !isMethodDeprecated(content, i)) {
+                    methods.add(new MethodInfo(i, line, methodName));
+                }
+            } else {
+                if (line.trim().contains(methodName + "(") && !isMethodDeprecated(content, i) && 
+                    !line.trim().contains("System.out.println") && !line.trim().contains("System.err.println")) {
                     methods.add(new MethodInfo(i, line, methodName));
                 }
             }
@@ -298,7 +293,6 @@ public class DeprecationUtility {
 
         int insertLine = classInfo.lineNumber;
 
-        // Find the right place to insert
         while (insertLine > 0 && (lines[insertLine - 1].trim().startsWith("@") ||
                                  lines[insertLine - 1].trim().startsWith("/**") ||
                                  lines[insertLine - 1].trim().startsWith("*") ||
@@ -306,7 +300,6 @@ public class DeprecationUtility {
             insertLine--;
         }
 
-        // Create new content with deprecation
         StringBuilder newContent = new StringBuilder();
 
         for (int i = 0; i < lines.length; i++) {
@@ -367,26 +360,24 @@ public class DeprecationUtility {
         }
         details.append("Project path: ").append(projectRoot).append("\n\n");
 
-        // Deprecate methods
         for (Path javaFile : javaFiles) {
             String content = Files.readString(javaFile);
             String originalContent = content;
 
-            // Find method declarations
             List<MethodInfo> methods = findMethodDeclarations(content, methodName, methodSignature);
 
             if (!methods.isEmpty()) {
                 details.append("Found ").append(methods.size()).append(" occurrence(s) in: ").append(javaFile).append("\n");
 
-                // Sort methods by line number (descending) to avoid offset issues
                 methods.sort((a, b) -> Integer.compare(b.lineNumber, a.lineNumber));
 
                 for (MethodInfo method : methods) {
                     content = deprecateMethodInContent(content, method);
                     methodsDeprecated++;
+                    
+                    content = deprecateCalledMethods(content, method);
                 }
 
-                // Write back to file if content changed
                 if (!content.equals(originalContent)) {
                     Files.writeString(javaFile, content);
                     details.append("Updated: ").append(javaFile).append("\n");
@@ -397,7 +388,6 @@ public class DeprecationUtility {
 
         details.append("\n");
 
-        // Deprecate empty classes
         details.append("Checking for classes that can be deprecated...\n");
         List<ClassInfo> classesToDeprecate = findClassesToDeprecate();
 
@@ -406,7 +396,6 @@ public class DeprecationUtility {
             classesDeprecated++;
         }
 
-        // Apply class deprecations
         for (Path javaFile : javaFiles) {
             String content = Files.readString(javaFile);
             String originalContent = content;
@@ -421,7 +410,6 @@ public class DeprecationUtility {
                 }
             }
 
-            // Write back to file if content changed
             if (!content.equals(originalContent)) {
                 Files.writeString(javaFile, content);
             }
@@ -433,5 +421,187 @@ public class DeprecationUtility {
         details.append("Total classes deprecated: ").append(classesDeprecated).append("\n");
 
         return new WebServer.DeprecationResult(true, filesUpdated, methodsDeprecated, classesDeprecated, details.toString(), null);
+    }
+
+    /**
+     * Find and deprecate methods that are called from the deprecated method
+     */
+    private String deprecateCalledMethods(String content, MethodInfo deprecatedMethod) throws IOException {
+        String[] lines = content.split("\n");
+        int methodStart = findMethodStart(lines, deprecatedMethod.lineNumber);
+        int methodEnd = findMethodEnd(lines, deprecatedMethod.lineNumber);
+        
+        StringBuilder methodBody = new StringBuilder();
+        for (int i = methodStart; i <= methodEnd; i++) {
+            methodBody.append(lines[i]).append("\n");
+        }
+        
+        Set<String> calledMethods = findMethodCalls(methodBody.toString());
+        
+        for (String calledMethod : calledMethods) {
+            if (!isGetterOrSetter(calledMethod)) {
+                content = deprecateCalledMethodInContent(content, calledMethod);
+            }
+        }
+        
+        return content;
+    }
+
+    /**
+     * Find method calls in a given text
+     */
+    private Set<String> findMethodCalls(String text) {
+        Set<String> methodCalls = new HashSet<>();
+        
+        Pattern pattern = Pattern.compile("\\b(\\w+)\\s*\\(");
+        Matcher matcher = pattern.matcher(text);
+        
+        while (matcher.find()) {
+            String methodName = matcher.group(1);
+            
+            if (!isExcludedMethod(methodName)) {
+                methodCalls.add(methodName);
+            }
+        }
+        
+        Pattern objectMethodPattern = Pattern.compile("\\b\\w+\\.(\\w+)\\s*\\(");
+        Matcher objectMethodMatcher = objectMethodPattern.matcher(text);
+        
+        while (objectMethodMatcher.find()) {
+            String methodName = objectMethodMatcher.group(1);
+            
+            if (!isExcludedMethod(methodName)) {
+                methodCalls.add(methodName);
+            }
+        }
+        
+        return methodCalls;
+    }
+
+    /**
+     * Check if a method name should be excluded from deprecation
+     */
+    private boolean isExcludedMethod(String methodName) {
+        String[] excludedKeywords = {
+            "if", "for", "while", "switch", "catch", "try", "new", "return", "throw",
+            "System", "Math", "String", "Integer", "Double", "Boolean", "List", "Map",
+            "Arrays", "Collections", "Objects", "Optional", "Stream", "println", "print"
+        };
+        
+        for (String keyword : excludedKeywords) {
+            if (methodName.equals(keyword)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * Check if a method is a getter or setter
+     */
+    private boolean isGetterOrSetter(String methodName) {
+        if (methodName.startsWith("get") && methodName.length() > 3) {
+            return true;
+        }
+        if (methodName.startsWith("is") && methodName.length() > 2) {
+            return true;
+        }
+        if (methodName.startsWith("set") && methodName.length() > 3) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Deprecate a called method in the content
+     */
+    private String deprecateCalledMethodInContent(String content, String methodName) throws IOException {
+        for (Path javaFile : javaFiles) {
+            String fileContent = Files.readString(javaFile);
+            String[] lines = fileContent.split("\n");
+            
+            for (int i = 0; i < lines.length; i++) {
+                if (isMethodDeclaration(lines[i], methodName) && !isMethodDeprecated(fileContent, i)) {
+                    int insertLine = i;
+                    while (insertLine > 0 && (lines[insertLine - 1].trim().startsWith("@") ||
+                                             lines[insertLine - 1].trim().startsWith("/**") ||
+                                             lines[insertLine - 1].trim().startsWith("*") ||
+                                             lines[insertLine - 1].trim().isEmpty())) {
+                        insertLine--;
+                    }
+                    
+                    StringBuilder newContent = new StringBuilder();
+                    for (int j = 0; j < lines.length; j++) {
+                        if (j == insertLine) {
+                            newContent.append(DEPRECATION_COMMENT).append("\n");
+                            newContent.append(DEPRECATION_ANNOTATION).append("\n");
+                        }
+                        newContent.append(lines[j]);
+                        if (j < lines.length - 1) {
+                            newContent.append("\n");
+                        }
+                    }
+                    
+                    Files.writeString(javaFile, newContent.toString());
+                }
+            }
+        }
+        
+        return content;
+    }
+
+    /**
+     * Check if a line is a method declaration for the given method name
+     */
+    private boolean isMethodDeclaration(String line, String methodName) {
+        String trimmed = line.trim();
+        Pattern pattern = Pattern.compile("\\s*(\\w+\\s+)*" + Pattern.quote(methodName) + "\\s*\\(");
+        return pattern.matcher(trimmed).find();
+    }
+
+    /**
+     * Find the start of a method (including annotations)
+     */
+    private int findMethodStart(String[] lines, int methodLine) {
+        int start = methodLine;
+        
+        while (start > 0 && (lines[start - 1].trim().startsWith("@") ||
+                             lines[start - 1].trim().startsWith("/**") ||
+                             lines[start - 1].trim().startsWith("*") ||
+                             lines[start - 1].trim().isEmpty())) {
+            start--;
+        }
+        
+        return start;
+    }
+
+    /**
+     * Find the end of a method
+     */
+    private int findMethodEnd(String[] lines, int methodLine) {
+        int braceCount = 0;
+        boolean inMethod = false;
+        
+        for (int i = methodLine; i < lines.length; i++) {
+            String line = lines[i];
+            
+            if (line.contains("{")) {
+                if (!inMethod) {
+                    inMethod = true;
+                }
+                braceCount++;
+            }
+            
+            if (line.contains("}")) {
+                braceCount--;
+                if (inMethod && braceCount == 0) {
+                    return i;
+                }
+            }
+        }
+        
+        return lines.length - 1;
     }
 }

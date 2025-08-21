@@ -1,17 +1,12 @@
 #!/bin/bash
 
-# Tomcat Deployment Script for Java Deprecation Utility
-# This script helps deploy the application to a standalone Tomcat server
-
 echo "Tomcat Deployment Script for Java Deprecation Utility"
 echo "========================================================"
 
-# Configuration
 WAR_FILE="target/deprecation-utility.war"
 TOMCAT_WEBAPPS="${TOMCAT_HOME:-/usr/local/tomcat}/webapps"
 APP_NAME="deprecation-utility"
 
-# Check if WAR file exists
 if [ ! -f "$WAR_FILE" ]; then
     echo "WAR file not found: $WAR_FILE"
     echo "   Please run 'mvn clean package' first"
@@ -30,14 +25,12 @@ echo "Deploying $APP_NAME to Tomcat..."
 echo "   Source: $WAR_FILE"
 echo "   Destination: $TOMCAT_WEBAPPS/$APP_NAME.war"
 
-# Stop Tomcat if running
 echo "Stopping Tomcat..."
 if pgrep -f tomcat > /dev/null; then
     pkill -f tomcat
     sleep 3
 fi
 
-# Remove existing deployment
 if [ -d "$TOMCAT_WEBAPPS/$APP_NAME" ]; then
     echo "Removing existing deployment..."
     rm -rf "$TOMCAT_WEBAPPS/$APP_NAME"
@@ -48,20 +41,16 @@ if [ -f "$TOMCAT_WEBAPPS/$APP_NAME.war" ]; then
     rm -f "$TOMCAT_WEBAPPS/$APP_NAME.war"
 fi
 
-# Copy new WAR file
 echo "Copying WAR file..."
 cp "$WAR_FILE" "$TOMCAT_WEBAPPS/"
 
-# Start Tomcat
 echo "Starting Tomcat..."
 cd "$TOMCAT_WEBAPPS/.."
 ./bin/startup.sh
 
-# Wait for deployment
 echo "Waiting for deployment to complete..."
 sleep 10
 
-# Check if application is accessible
 echo "Testing application..."
 if curl -s "http://localhost:8080/$APP_NAME/" > /dev/null; then
     echo "Deployment successful!"

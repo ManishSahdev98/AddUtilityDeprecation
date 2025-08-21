@@ -24,7 +24,6 @@ public class DeprecationServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         
         try {
-            // Read request body
             StringBuilder requestBody = new StringBuilder();
             try (BufferedReader reader = request.getReader()) {
                 String line;
@@ -34,7 +33,6 @@ public class DeprecationServlet extends HttpServlet {
                 }
             }
             
-            // Parse JSON request
             JsonNode jsonNode = objectMapper.readTree(requestBody.toString());
 
             String methodName = jsonNode.has("methodName") ? jsonNode.get("methodName").asText() : null;
@@ -47,12 +45,12 @@ public class DeprecationServlet extends HttpServlet {
                 sendErrorResponse(response, "Missing required parameters: methodName and projectPath");
                 return;
             }
+/** Do not change without asking Sahdev Team*/
+@Deprecated
             
-            // Run deprecation utility
             DeprecationUtility utility = new DeprecationUtility(projectPath);
             WebServer.DeprecationResult result = utility.deprecateMethodWithResult(methodName, methodSignature);
             
-            // Send success response
             String jsonResponse = objectMapper.writeValueAsString(result);
             response.setStatus(HttpServletResponse.SC_OK);
             

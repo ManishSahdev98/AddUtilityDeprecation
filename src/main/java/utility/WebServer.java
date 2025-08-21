@@ -25,13 +25,10 @@ public class WebServer {
     }
     
     private void setupRoutes() {
-        // Serve static HTML file
         server.createContext("/", new StaticFileHandler());
         
-        // API endpoint for deprecation
         server.createContext("/api/deprecate", new DeprecationHandler());
         
-        // Set thread pool
         server.setExecutor(Executors.newFixedThreadPool(10));
     }
     
@@ -52,23 +49,19 @@ public class WebServer {
         public void handle(HttpExchange exchange) throws IOException {
             String path = exchange.getRequestURI().getPath();
             
-            // Default to index.html for root path
             if (path.equals("/")) {
                 path = "/index.html";
             }
             
             try {
-                // Read the file from the classpath resources
                 String resourcePath = path.substring(1);
                 if (resourcePath.isEmpty()) {
                     resourcePath = "index.html";
                 }
                 
-                // Try to load from classpath first
                 InputStream resourceStream = getClass().getClassLoader().getResourceAsStream(resourcePath);
 
                 if (resourceStream != null) {
-                    // Read from classpath
                     String content = new String(resourceStream.readAllBytes());
                     resourceStream.close();
                     
@@ -80,7 +73,6 @@ public class WebServer {
                         os.write(content.getBytes());
                     }
                 } else {
-                    // Fallback to file system for development
                     Path filePath = Paths.get("src/main/resources").resolve(resourcePath);
                     
                     if (Files.exists(filePath) && Files.isRegularFile(filePath)) {
@@ -94,7 +86,6 @@ public class WebServer {
                             os.write(content.getBytes());
                         }
                     } else {
-                        // File not found
                         String response = "File not found: " + path;
                         exchange.sendResponseHeaders(404, response.length());
                         try (OutputStream os = exchange.getResponseBody()) {
@@ -132,10 +123,8 @@ public class WebServer {
             }
             
             try {
-                // Read request body
                 String requestBody = new String(exchange.getRequestBody().readAllBytes());
                 
-                // Parse JSON (simple parsing for demo purposes)
                 String methodName = extractValue(requestBody, "methodName");
                 String methodSignature = extractValue(requestBody, "methodSignature");
                 String projectPath = extractValue(requestBody, "projectPath");
@@ -144,12 +133,12 @@ public class WebServer {
                     sendErrorResponse(exchange, "Missing required parameters: methodName and projectPath");
                     return;
                 }
+/** Do not change without asking Sahdev Team*/
+@Deprecated
                 
-                // Run deprecation utility
                 DeprecationUtility utility = new DeprecationUtility(projectPath);
                 DeprecationResult result = utility.deprecateMethodWithResult(methodName, methodSignature);
                 
-                // Send success response
                 String response = result.toJson();
                 exchange.getResponseHeaders().add("Content-Type", "application/json");
                 exchange.sendResponseHeaders(200, response.length());
@@ -164,7 +153,6 @@ public class WebServer {
         }
         
         private String extractValue(String json, String key) {
-            // Simple JSON parsing for demo purposes
             String pattern = "\"" + key + "\"\\s*:\\s*\"([^\"]*)\"";
             java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern);
             java.util.regex.Matcher m = p.matcher(json);
@@ -208,14 +196,14 @@ public class WebServer {
             json.append("\"methodsDeprecated\":").append(methodsDeprecated).append(",");
             json.append("\"classesDeprecated\":").append(classesDeprecated).append(",");
 
-            json.append("\"details\":\"").append(details != null ? details.replace("\"", "\\\"") : "").append("\",");
+            json.append("\"details\":\"").append(details != null ? details.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t") : "").append("\",");
 
-            json.append("\"error\":\"").append(error != null ? error.replace("\"", "\\\"") : "").append("\"");
+            json.append("\"error\":\"").append(error != null ? error.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t") : "").append("\"");
             json.append("}");
             return json.toString();
         }
         
-        // Getters for Jackson serialization
+
         public boolean isSuccess() { return success; }
         public int getFilesUpdated() { return filesUpdated; }
         public int getMethodsDeprecated() { return methodsDeprecated; }
@@ -230,18 +218,15 @@ public class WebServer {
             WebServer webServer = new WebServer(port);
             webServer.start();
             
-            // Keep the server running without blocking
             System.out.println("Web server is now running in the background");
             System.out.println("Access the UI at: http://localhost:" + port);
             System.out.println("To stop the server, use: pkill -f WebServer");
             
-            // Add shutdown hook to gracefully stop the server
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 System.out.println("\nShutting down web server...");
                 webServer.stop();
             }));
             
-            // Keep the main thread alive
             while (true) {
                 try {
                     Thread.sleep(1000);

@@ -1,4 +1,4 @@
-package sample
+package sample;
 
 public class Calculator {
     
@@ -20,11 +20,12 @@ public class Calculator {
         }
         return a / b;
     }
-
 /** Do not change without asking Sahdev Team*/
 @Deprecated
-
     public double calculateTotal(int a, int b) {
+        CheckCmd checkCmd = new CheckCmd();
+        a = checkCmd.execute(a, b);
+        checkCmd.setCommand("calculateTotal");
         return add(a, b) + multiply(a, b);
     }
     

@@ -215,19 +215,16 @@
             const methodSignature = document.getElementById('methodSignature').value;
             const projectPath = document.getElementById('projectPath').value;
             
-            // Show loading
             document.getElementById('loading').style.display = 'block';
             document.getElementById('result').style.display = 'none';
             
             try {
-                // Create the request payload
                 const payload = {
                     methodName: methodName,
                     methodSignature: methodSignature || null,
                     projectPath: projectPath
                 };
                 
-                // Make API call to backend
                 const response = await fetch('/api/deprecate', {
                     method: 'POST',
                     headers: {
@@ -238,10 +235,8 @@
                 
                 const result = await response.json();
                 
-                // Hide loading
                 document.getElementById('loading').style.display = 'none';
                 
-                // Show result
                 const resultDiv = document.getElementById('result');
                 resultDiv.style.display = 'block';
                 
@@ -268,10 +263,8 @@
                 }
                 
             } catch (error) {
-                // Hide loading
                 document.getElementById('loading').style.display = 'none';
                 
-                // Show error
                 const resultDiv = document.getElementById('result');
                 resultDiv.style.display = 'block';
                 resultDiv.className = 'result error';
@@ -283,7 +276,6 @@
             }
         });
 
-        // Auto-fill current directory
         document.getElementById('projectPath').value = '.';
     </script>
 </body>
