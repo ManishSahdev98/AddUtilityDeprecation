@@ -45,9 +45,6 @@ public class DeprecationServlet extends HttpServlet {
                 sendErrorResponse(response, "Missing required parameters: methodName and projectPath");
                 return;
             }
-/** Do not change without asking Sahdev Team*/
-@Deprecated
-            
             DeprecationUtility utility = new DeprecationUtility(projectPath);
             WebServer.DeprecationResult result = utility.deprecateMethodWithResult(methodName, methodSignature);
             

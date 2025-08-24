@@ -133,9 +133,6 @@ public class WebServer {
                     sendErrorResponse(exchange, "Missing required parameters: methodName and projectPath");
                     return;
                 }
-/** Do not change without asking Sahdev Team*/
-@Deprecated
-                
                 DeprecationUtility utility = new DeprecationUtility(projectPath);
                 DeprecationResult result = utility.deprecateMethodWithResult(methodName, methodSignature);
                 

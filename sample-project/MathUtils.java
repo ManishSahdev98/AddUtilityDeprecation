@@ -15,8 +15,6 @@ public class MathUtils {
         return true;
     }
 
-    /** Do not change without asking Sahdev Team*/
-    @Deprecated
     public double calculateTotal(int a, int b) {
         return a + b;
     }
