@@ -23,8 +23,8 @@ public class DeprecationUtility {
     public static void main(String[] args) {
         if (args.length < 2) {
             System.out.println("Usage: java utility.DeprecationUtility <project_path> <method_name> [method_signature]");
-            System.out.println("Example: java utility.DeprecationUtility /path/to/project calculateTotal");
-            System.out.println("Example: java utility.DeprecationUtility /path/to/project calculateTotal \"int calculateTotal(int a, int b)\"");
+            System.out.println("Example: java utility.DeprecationUtility /path/to/project methodName");
+            System.out.println("Example: java utility.DeprecationUtility /path/to/project methodName \"returnType methodName(int a, int b)\"");
             System.exit(1);
         }
 
